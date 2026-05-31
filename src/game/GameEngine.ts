@@ -26,9 +26,12 @@ export class GameEngine {
   public players: Map<string, Player> = new Map();
   public enemies: Map<string, Enemy> = new Map();
   public drops: Map<string, DroppedItem> = new Map();
+  public doors: Map<string, Door> = new Map();
   
   public isHost: boolean = false;
   public localPlayerId: string = "";
+  public mapId: string = "";
+  public mapState: any = {};
   
   public inputs: Map<string, InputState> = new Map();
   
@@ -36,6 +39,9 @@ export class GameEngine {
   public worldBounds = { width: 2000, height: 2000 };
   
   public onDropPickup?: (playerId: string, drop: DroppedItem) => void;
+  public onTutorialMsg?: (msg: string) => void;
+  public onMapTransition?: (newMapId: string) => void;
+  
   private spawnTimer = 0;
 
   constructor(isHost: boolean, localId: string, rtcManager: WebRTCManager | null) {

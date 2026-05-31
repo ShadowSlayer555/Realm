@@ -21,6 +21,10 @@ export function GameOverlay() {
   const [showDeathScreen, setShowDeathScreen] = useState(false);
   const [mapMessage, setMapMessage] = useState<string | null>(null);
 
+  const [showMap, setShowMap] = useState(false);
+  const [localPos, setLocalPos] = useState<{x: number, y: number} | undefined>(undefined);
+  const [worldBounds, setWorldBounds] = useState<{width: number, height: number} | undefined>(undefined);
+
   // Joystick & Input State
   const inputRef = useRef<InputState>({ x: 0, y: 0, attack: false });
   // We use a ref so we don't trigger useEffect when saveData changes
@@ -101,6 +105,8 @@ export function GameOverlay() {
       if (p) {
          setLocalHp(p.hp);
          setLocalMaxHp(p.maxHp);
+         setLocalPos({ x: p.pos.x, y: p.pos.y });
+         setWorldBounds(engine.worldBounds);
          if (p.isDead && !showDeathScreen) {
              setShowDeathScreen(true);
          }
@@ -194,7 +200,7 @@ export function GameOverlay() {
       )}
 
       {/* HUD Rendering extracted */}
-      <HUD localHp={localHp} localMaxHp={localMaxHp} />
+      <HUD localHp={localHp} localMaxHp={localMaxHp} localPos={localPos} worldBounds={worldBounds} showMap={showMap} setShowMap={setShowMap} />
 
       <div className="absolute top-4 right-4 flex gap-2 pointer-events-auto z-20">
          <button 

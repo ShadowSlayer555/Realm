@@ -42,7 +42,7 @@ function RedShrinkingBar({ current, max, colorClass, baseClass }: { current: num
    );
 }
 
-export function HUD({ localHp, localMaxHp }: { localHp: number, localMaxHp: number }) {
+export function HUD({ localHp, localMaxHp, localPos, worldBounds, showMap, setShowMap }: { localHp: number, localMaxHp: number, localPos?: {x: number, y: number}, worldBounds?: {width: number, height: number}, showMap: boolean, setShowMap: (val: boolean) => void }) {
   const { saveData, notifications } = useStore();
   const [showInventory, setShowInventory] = useState(false);
 
@@ -99,12 +99,45 @@ export function HUD({ localHp, localMaxHp }: { localHp: number, localMaxHp: numb
            <div className="bg-slate-900/95 border-t-2 border-b-2 border-r-2 border-l border-slate-800 rounded-r-lg p-2 flex flex-col w-16 shadow-2xl backdrop-blur-md h-[4.5rem] justify-center gap-1">
               <button 
                  onClick={() => setShowInventory(!showInventory)}
-                 className="w-full py-1 bg-slate-800 hover:bg-emerald-800 text-white text-xs font-bold rounded"
+                 className={`w-full py-0.5 text-xs font-bold rounded flex-1 ${showInventory ? 'bg-emerald-600 text-white' : 'bg-slate-800 hover:bg-emerald-800 text-slate-300'}`}
               >
                  INV
               </button>
+              <button 
+                 onClick={() => setShowMap(!showMap)}
+                 className={`w-full py-0.5 text-xs font-bold rounded flex-1 ${showMap ? 'bg-blue-600 text-white' : 'bg-slate-800 hover:bg-blue-800 text-slate-300'}`}
+              >
+                 MAP
+              </button>
            </div>
         </div>
+
+        {/* Circular Mini Map Overlay */}
+        {showMap && localPos && worldBounds && (
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 md:w-96 md:h-96 rounded-full bg-slate-900/90 border-4 border-slate-700 shadow-2xl overflow-hidden z-30 pointer-events-none fade-in">
+              {/* Map background/grid */}
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-30" />
+              
+              {/* Central Player Blip */}
+              <div 
+                 className="absolute w-4 h-4 rounded-full bg-red-500 shadow-[0_0_10px_red]"
+                 style={{ 
+                   left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+                   animation: 'pulse 1.5s infinite' 
+                 }} 
+              />
+              <style>{`
+                 @keyframes pulse {
+                    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+                    70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+                    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+                 }
+              `}</style>
+
+              {/* Just indicate full bounds logically relative to center */}
+              {/* In a real game we would position other POIs using (x - localPos.x)/scale */}
+           </div>
+        )}
 
         {/* Inventory Screen */}
         {showInventory && (
