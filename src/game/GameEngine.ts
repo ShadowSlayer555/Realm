@@ -22,11 +22,18 @@ export interface Door {
   targetMap: string;
 }
 
+export interface StaticObject {
+  id: string;
+  pos: Vector2;
+  radius: number;
+}
+
 export class GameEngine {
   public players: Map<string, Player> = new Map();
   public enemies: Map<string, Enemy> = new Map();
   public drops: Map<string, DroppedItem> = new Map();
   public doors: Map<string, Door> = new Map();
+  public statics: StaticObject[] = [];
   
   public isHost: boolean = false;
   public localPlayerId: string = "";
@@ -73,6 +80,7 @@ export class GameEngine {
     this.enemies.clear();
     this.drops.clear();
     this.doors.clear();
+    this.statics = [];
     
     // Default world bounds
     this.worldBounds = { width: 2000, height: 2000 };
@@ -86,6 +94,10 @@ export class GameEngine {
     } else if (mapId === "camp") {
       // Safe zone, no enemies
       this.worldBounds = { width: 1500, height: 1500 };
+      // Camp central objects (radius block)
+      this.statics.push({ id: 'table', pos: {x: 15/0.02, y: 15/0.02}, radius: 100 });
+      this.statics.push({ id: 'stall', pos: {x: 5/0.02, y: 15/0.02}, radius: 120 });
+      this.statics.push({ id: 'fire', pos: {x: 25/0.02, y: 25/0.02}, radius: 50 });
     } else {
       // Standard level
       if (this.isHost) {
@@ -116,6 +128,21 @@ export class GameEngine {
             
             p.pos.x = Math.max(p.radius, Math.min(this.worldBounds.width - p.radius, p.pos.x));
             p.pos.y = Math.max(p.radius, Math.min(this.worldBounds.height - p.radius, p.pos.y));
+            
+            // Check statics collision
+            for (const st of this.statics) {
+               const distSq = this.distanceSq(p.pos, st.pos);
+               const minRadius = p.radius + st.radius;
+               if (distSq < minRadius * minRadius) {
+                  // Push out logic
+                  const dist = Math.sqrt(distSq);
+                  const overlap = minRadius - dist;
+                  if (dist > 0) {
+                     p.pos.x += ((p.pos.x - st.pos.x) / dist) * overlap;
+                     p.pos.y += ((p.pos.y - st.pos.y) / dist) * overlap;
+                  }
+               }
+            }
         }
 
         if (this.isHost) {
@@ -188,9 +215,9 @@ export class GameEngine {
          if (this.mapState.step === 0 && activeEnemies === 0) {
              this.mapState.step = 1;
              this.doors.set('tut_door', { id: 'tut_door', pos: { x: 500, y: 150 }, radius: 100, active: true, targetMap: 'camp' });
-             if (this.onTutorialMsg) this.onTutorialMsg("Go through the glowing door!");
+             if (this.onTutorialMsg) this.onTutorialMsg("Great! Now open Inventory & equip items.");
          } else if (this.mapState.step === 0) {
-             if (this.onTutorialMsg) this.onTutorialMsg("Defeat the Zombie to proceed!");
+             if (this.onTutorialMsg) this.onTutorialMsg("Press Attack to kill the Zombie! Use the Right Joystick.");
          }
       } else if (this.mapId !== 'camp') {
          // Basic level logic: spawn door when all dead

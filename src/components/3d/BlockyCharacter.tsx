@@ -10,9 +10,10 @@ interface PlayerModelProps {
   colorPrimary?: string;
   colorSecondary?: string;
   isZombie?: boolean;
+  equipment?: { melee?: string, ranged?: string, armor?: string };
 }
 
-export function BlockyCharacter({ position, rotation, isAttacking, isMoving, colorPrimary = '#00aaaa', colorSecondary = '#1111bb', isZombie = false }: PlayerModelProps) {
+export function BlockyCharacter({ position, rotation, isAttacking, isMoving, colorPrimary = '#00aaaa', colorSecondary = '#1111bb', isZombie = false, equipment }: PlayerModelProps) {
   const group = useRef<Group>(null);
   const leftArmGroup = useRef<Group>(null);
   const rightArmGroup = useRef<Group>(null);
@@ -62,8 +63,10 @@ export function BlockyCharacter({ position, rotation, isAttacking, isMoving, col
   });
 
   const skinColor = isZombie ? '#44aa44' : '#eebb99';
-  const shirtColor = isZombie ? '#00aaaa' : colorPrimary;
-  const pantsColor = isZombie ? '#4444aa' : colorSecondary;
+  const hasArmor = !!equipment?.armor;
+  const shirtColor = isZombie ? '#00aaaa' : (hasArmor ? '#64748b' : colorPrimary);
+  const pantsColor = isZombie ? '#4444aa' : (hasArmor ? '#475569' : colorSecondary);
+  const hasMelee = !!equipment?.melee;
 
   return (
     <group ref={group} position={position} rotation={rotation}>
@@ -78,12 +81,20 @@ export function BlockyCharacter({ position, rotation, isAttacking, isMoving, col
         <boxGeometry args={[0.5, 0.5, 0.5]} />
         <meshStandardMaterial color={skinColor} />
       </mesh>
+      
+      {/* Helmet if armor */}
+      {hasArmor && (
+         <mesh position={[0, 1.45, 0]} castShadow>
+           <boxGeometry args={[0.55, 0.35, 0.55]} />
+           <meshStandardMaterial color="#334155" />
+         </mesh>
+      )}
 
       {/* Left Arm Pivot */}
       <group ref={leftArmGroup} position={[0.375, 1.125, 0]}>
         <mesh position={[0, -0.375, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.25, 0.75, 0.25]} />
-          <meshStandardMaterial color={skinColor} />
+          <meshStandardMaterial color={hasArmor ? shirtColor : skinColor} />
         </mesh>
       </group>
 
@@ -91,26 +102,23 @@ export function BlockyCharacter({ position, rotation, isAttacking, isMoving, col
       <group ref={rightArmGroup} position={[-0.375, 1.125, 0]}>
          <mesh position={[0, -0.375, 0]} castShadow receiveShadow>
            <boxGeometry args={[0.25, 0.75, 0.25]} />
-           <meshStandardMaterial color={skinColor} />
+           <meshStandardMaterial color={hasArmor ? shirtColor : skinColor} />
          </mesh>
          
          {/* Weapon */}
-         {!isZombie && (
+         {!isZombie && hasMelee && (
            <group ref={weaponGroup} position={[0, -0.75, 0.1]} rotation={[Math.PI / 2, 0, 0]}>
-             {/* Blade */}
              <mesh position={[0, 0.4, 0]} castShadow receiveShadow>
                <boxGeometry args={[0.05, 0.8, 0.1]} />
-               <meshStandardMaterial color="#aaaaaa" />
+               <meshStandardMaterial color="#cbd5e1" />
              </mesh>
-             {/* Handle */}
              <mesh position={[0, 0, 0]} castShadow receiveShadow>
                <boxGeometry args={[0.05, 0.2, 0.05]} />
                <meshStandardMaterial color="#8b4513" />
              </mesh>
-             {/* Guard */}
              <mesh position={[0, 0.1, 0]} castShadow receiveShadow>
                <boxGeometry args={[0.2, 0.05, 0.1]} />
-               <meshStandardMaterial color="#333333" />
+               <meshStandardMaterial color="#334155" />
              </mesh>
            </group>
          )}

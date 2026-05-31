@@ -202,7 +202,7 @@ export function GameOverlay() {
       )}
 
       {/* HUD Rendering extracted */}
-      <HUD localHp={localHp} localMaxHp={localMaxHp} localPos={localPos} worldBounds={worldBounds} showMap={showMap} setShowMap={setShowMap} />
+      <HUD localHp={localHp} localMaxHp={localMaxHp} localPos={localPos} worldBounds={worldBounds} showMap={showMap} setShowMap={setShowMap} engine={engineRef.current} />
 
       <div className="absolute top-4 right-4 flex gap-2 pointer-events-auto z-20">
          <button 

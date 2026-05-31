@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { GameEngine } from '../../game/GameEngine';
 import { BlockyCharacter } from './BlockyCharacter';
 import { Vector3, MathUtils } from 'three';
+import { useStore } from '../../store';
 
 // Procedural Tree Component
 function Tree({ position }: { position: [number, number, number] }) {
@@ -109,6 +110,9 @@ function PlayerWrapper({ engine, id, isLocal }: { engine: GameEngine, id: string
   const [pos, setPos] = useState<[number, number, number]>([0,0,0]);
   const [rot, setRot] = useState<[number, number, number]>([0,0,0]);
   const [deadRot, setDeadRot] = useState(0);
+  
+  // Read local equipment for visualization
+  const equipment = useStore(state => isLocal ? state.saveData?.player.equipment : undefined);
 
   useFrame((state, delta) => {
     const player = engine.players.get(id);
@@ -163,6 +167,7 @@ function PlayerWrapper({ engine, id, isLocal }: { engine: GameEngine, id: string
           isMoving={moving} 
           isAttacking={attacking} 
           colorPrimary={isLocal ? '#10b981' : '#3b82f6'} 
+          equipment={equipment}
        />
     </group>
   );
@@ -308,15 +313,22 @@ export function GameScene({ engine, localId }: { engine: GameEngine, localId: st
         shadow-camera-bottom={-20}
       />
       
-      {/* Floor */}
+      {/* Floor Elements */}
       <mesh 
         rotation={[-Math.PI / 2, 0, 0]} 
-        position={[engine.worldBounds.width * 0.01, 0, engine.worldBounds.height * 0.01]}
+        position={[engine.worldBounds.width * 0.01, -0.01, engine.worldBounds.height * 0.01]}
         receiveShadow
       >
         <planeGeometry args={[engine.worldBounds.width * 0.02, engine.worldBounds.height * 0.02]} />
-        <meshStandardMaterial color={engine.mapId === 'camp' ? '#a3e635' : "#4ade80"} />
+        <meshStandardMaterial color={engine.mapId === 'camp' ? '#334155' : "#064e3b"} />
       </mesh>
+      
+      {/* Grid overlay for better sense of scale and not just a weird plane */}
+      <gridHelper 
+         args={[Math.max(engine.worldBounds.width, engine.worldBounds.height) * 0.02, 50, '#10b981', '#10b981']} 
+         position={[engine.worldBounds.width * 0.01, 0, engine.worldBounds.height * 0.01]} 
+         rotation={[0, 0, 0]}
+      />
 
       {/* Decorative Trees */}
       {trees.map((t, i) => (

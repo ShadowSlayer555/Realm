@@ -19,7 +19,9 @@ interface GameState {
   loadSave: (save: GameSave) => void;
   exportSave: () => void;
   initializeSave: () => void; // call on boot, creates new save if null
-  addToInventory: (type: string, amount: number) => void;
+  addToInventory: (type: string, amount: number, category?: InventoryItem['category']) => void;
+  equipItem: (itemId: string, slot: keyof PlayerData['equipment']) => void;
+  useItem: (itemId: string) => void;
   addXp: (amount: number) => void;
 
   // HUD state
@@ -89,7 +91,7 @@ export const useStore = create<GameState>((set, get) => ({
      setTimeout(() => set({ showXpScale: 0 }), 3000);
   },
 
-  addToInventory: (type: string, amount: number) => {
+  addToInventory: (type: string, amount: number, category: InventoryItem['category'] = 'material') => {
     const notifId = uuidv4();
     set((state) => {
       const newNotifs = [...state.notifications, { id: notifId, type, amount }];
@@ -100,7 +102,7 @@ export const useStore = create<GameState>((set, get) => ({
       
       const newInventory = existing 
          ? player.inventory.map(i => i.type === type ? { ...i, amount: i.amount + amount } : i)
-         : [...player.inventory, { id: uuidv4(), type, amount, isEquipped: false }];
+         : [...player.inventory, { id: uuidv4(), type, category, amount, isEquipped: false }];
 
       return {
         notifications: newNotifs,
@@ -114,6 +116,35 @@ export const useStore = create<GameState>((set, get) => ({
       };
     });
     setTimeout(() => get().removeNotification(notifId), 2500);
+  },
+
+  equipItem: (itemId: string, slot: keyof PlayerData['equipment']) => {
+    set((state) => {
+      if (!state.saveData) return state;
+      const { player } = state.saveData;
+      return {
+         saveData: {
+            ...state.saveData,
+            player: {
+               ...player,
+               equipment: {
+                 ...player.equipment,
+                 [slot]: itemId
+               }
+            }
+         }
+      }
+    });
+  },
+
+  useItem: (itemId: string) => {
+     // placeholder for item usage logic
+     set((state) => {
+        if (!state.saveData) return state;
+        const item = state.saveData.player.inventory.find(i => i.id === itemId);
+        if (!item || item.amount <= 0) return state;
+        return state;
+     });
   },
 
   isHost: false,

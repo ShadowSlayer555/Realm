@@ -1,6 +1,7 @@
 export interface InventoryItem {
   id: string;
   type: string;
+  category: 'melee' | 'ranged' | 'armor' | 'artifact' | 'potion' | 'material';
   amount: number;
   isEquipped?: boolean;
 }
@@ -11,6 +12,14 @@ export interface PlayerData {
   level: number;
   xp: number;
   inventory: InventoryItem[]; // items
+  equipment: {
+    armor?: string; // item id
+    melee?: string;
+    ranged?: string;
+    artifact1?: string;
+    artifact2?: string;
+    artifact3?: string;
+  };
   stats: {
     hp: number;
     maxHp: number;
