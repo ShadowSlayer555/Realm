@@ -112,13 +112,13 @@ export function HUD({ localHp, localMaxHp, localPos, worldBounds, showMap, setSh
               <div className="absolute -top-6 text-[10px] text-slate-400 font-bold uppercase tracking-widest w-full text-center">Quick Use</div>
               
               <button onClick={() => alert("Used artifact 1")} className="w-12 h-12 bg-slate-800 border-2 border-slate-600 rounded flex items-center justify-center hover:bg-slate-700 text-slate-400 font-bold text-sm relative transition-colors overflow-hidden group shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)]">
-                 {saveData.player.equipment.artifact1 ? <span className="text-2xl drop-shadow group-hover:scale-110 transition-transform">💎</span> : '1'}
+                 {saveData.player.equipment?.artifact1 ? <span className="text-2xl drop-shadow group-hover:scale-110 transition-transform">💎</span> : '1'}
               </button>
               <button className="w-12 h-12 bg-slate-800 border-2 border-slate-600 rounded flex items-center justify-center hover:bg-slate-700 text-slate-400 font-bold text-sm relative transition-colors overflow-hidden group shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)]">
-                 {saveData.player.equipment.artifact2 ? <span className="text-2xl drop-shadow group-hover:scale-110 transition-transform">📜</span> : '2'}
+                 {saveData.player.equipment?.artifact2 ? <span className="text-2xl drop-shadow group-hover:scale-110 transition-transform">📜</span> : '2'}
               </button>
               <button className="w-12 h-12 bg-slate-800 border-2 border-slate-600 rounded flex items-center justify-center hover:bg-slate-700 text-slate-400 font-bold text-sm relative transition-colors overflow-hidden group shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)]">
-                 {saveData.player.equipment.artifact3 ? <span className="text-2xl drop-shadow group-hover:scale-110 transition-transform">🔮</span> : '3'}
+                 {saveData.player.equipment?.artifact3 ? <span className="text-2xl drop-shadow group-hover:scale-110 transition-transform">🔮</span> : '3'}
               </button>
               <button onClick={() => alert("Used potion")} className="w-12 h-12 bg-slate-800 border-2 border-slate-600 rounded flex items-center justify-center hover:bg-slate-700 text-slate-400 font-bold text-sm relative transition-colors overflow-hidden group shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)] ml-2">
                  <span className="text-2xl drop-shadow group-hover:scale-110 transition-transform">🧪</span>
@@ -245,16 +245,16 @@ export function HUD({ localHp, localMaxHp, localPos, worldBounds, showMap, setSh
 
                     {/* Equipment slots around the border */}
                     <div className="absolute top-2 left-2 z-20 flex flex-col gap-2">
-                       <EquipSlot type="melee" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment.melee)} />
-                       <EquipSlot type="ranged" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment.ranged)} />
+                       <EquipSlot type="melee" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment?.melee)} />
+                       <EquipSlot type="ranged" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment?.ranged)} />
                     </div>
                     <div className="absolute top-2 right-2 z-20 flex flex-col gap-2">
-                       <EquipSlot type="armor" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment.armor)} />
+                       <EquipSlot type="armor" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment?.armor)} />
                     </div>
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-                       <EquipSlot type="artifact" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment.artifact1)} />
-                       <EquipSlot type="artifact" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment.artifact2)} />
-                       <EquipSlot type="artifact" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment.artifact3)} />
+                       <EquipSlot type="artifact" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment?.artifact1)} />
+                       <EquipSlot type="artifact" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment?.artifact2)} />
+                       <EquipSlot type="artifact" item={saveData.player.inventory.find(i => i.id === saveData.player.equipment?.artifact3)} />
                     </div>
                  </div>
 

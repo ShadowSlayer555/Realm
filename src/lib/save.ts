@@ -7,6 +7,7 @@ const DEFAULT_PLAYER: PlayerData = {
   level: 1,
   xp: 0,
   inventory: [],
+  equipment: {},
   stats: {
     hp: 100,
     maxHp: 100,

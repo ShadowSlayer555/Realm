@@ -128,7 +128,7 @@ export const useStore = create<GameState>((set, get) => ({
             player: {
                ...player,
                equipment: {
-                 ...player.equipment,
+                 ...(player.equipment || {}),
                  [slot]: itemId
                }
             }
