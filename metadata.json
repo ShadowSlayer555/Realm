@@ -1,0 +1,6 @@
+{
+  "name": "OfflineGame",
+  "description": "A peer-to-peer (P2P) offline multiplayer gaming platform using WebRTC signaling for serverless gameplay.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
