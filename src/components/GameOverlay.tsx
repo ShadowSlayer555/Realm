@@ -20,6 +20,8 @@ export function GameOverlay() {
   const [localMaxHp, setLocalMaxHp] = useState(100);
   const [showDeathScreen, setShowDeathScreen] = useState(false);
   const [mapMessage, setMapMessage] = useState<string | null>(null);
+  
+  const [pendingMapId, setPendingMapId] = useState<string | null>(null);
 
   const [showMap, setShowMap] = useState(false);
   const [localPos, setLocalPos] = useState<{x: number, y: number} | undefined>(undefined);
@@ -59,7 +61,7 @@ export function GameOverlay() {
     }
     
     engine.onMapTransition = (newMapId) => {
-       engine.loadMap(newMapId);
+       setPendingMapId(newMapId);
     }
 
     // Add local player
@@ -241,6 +243,31 @@ export function GameOverlay() {
            >
              Continue to Camp
            </button>
+        </div>
+      )}
+
+      {pendingMapId && (
+        <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-md z-50 flex flex-col items-center justify-center text-center p-8 fade-in">
+           <h1 className="text-5xl font-bold text-emerald-400 mb-4 uppercase tracking-widest drop-shadow-[0_0_15px_rgba(16,185,129,0.8)]">Victory</h1>
+           <p className="text-slate-300 mb-12 max-w-md">You've cleared the area. A reward awaits!</p>
+           
+           <div className="group relative w-32 h-32 mb-12 cursor-pointer flex items-center justify-center bg-slate-800 border-2 border-emerald-500 rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:shadow-[0_0_50px_rgba(16,185,129,0.8)] transition-all overflow-hidden"
+                onClick={() => {
+                   if (engineRef.current?.mapId === 'tutorial' && !saveData?.player.tutorialCompleted) {
+                      addToInventory("Bottomless Health Potion", 1);
+                      useStore.setState(s => s.saveData ? { saveData: {...s.saveData, player: {...s.saveData.player, tutorialCompleted: true}} } : s);
+                   } else {
+                      const possibleLoot = ['iron sword', 'mana potion', 'gold coins', 'ruby'];
+                      addToInventory(possibleLoot[Math.floor(Math.random() * possibleLoot.length)], 1);
+                   }
+                   if (engineRef.current) engineRef.current.loadMap(pendingMapId);
+                   setPendingMapId(null);
+                }}>
+              <div className="absolute inset-0 bg-emerald-500 opacity-20 group-hover:scale-150 transition-transform duration-500 rounded-full blur-xl" />
+              <span className="text-4xl">🎁</span>
+           </div>
+
+           <p className="text-slate-400 text-sm animate-pulse uppercase tracking-widest">Tap to Open</p>
         </div>
       )}
     </div>

@@ -33,15 +33,34 @@ function ObjectiveDoor({ engine, id }: { engine: GameEngine, id: string }) {
 
    return (
       <group position={pos} rotation={[0, rotY, 0]}>
-         <mesh position={[0, 1.5, 0]} castShadow receiveShadow>
-           <boxGeometry args={[3, 4, 1]} />
-           <meshStandardMaterial color="#222" />
+         {/* Arch pillars */}
+         <mesh position={[-2, 2, 0]} castShadow receiveShadow>
+           <cylinderGeometry args={[0.5, 0.5, 6, 8]} />
+           <meshStandardMaterial color="#475569" />
          </mesh>
-         <mesh position={[0, 1.5, 0.55]}>
-           <planeGeometry args={[2.8, 3.8]} />
-           <meshBasicMaterial color="#ffffaa" />
+         <mesh position={[2, 2, 0]} castShadow receiveShadow>
+           <cylinderGeometry args={[0.5, 0.5, 6, 8]} />
+           <meshStandardMaterial color="#475569" />
          </mesh>
-         <pointLight position={[0, 1.5, 1]} color="#ffffaa" intensity={3} distance={10} />
+         {/* Arch top */}
+         <mesh position={[0, 5, 0]} castShadow receiveShadow>
+           <boxGeometry args={[5.5, 1, 1.5]} />
+           <meshStandardMaterial color="#334155" />
+         </mesh>
+         
+         {/* Glowing Interior Portal */}
+         <mesh position={[0, 2, 0]}>
+           <planeGeometry args={[3, 5]} />
+           <meshBasicMaterial color="#ffffff" transparent opacity={0.8} />
+         </mesh>
+         {/* Light pouring from door */}
+         <pointLight position={[0, 2, 1]} color="#ffffff" intensity={5} distance={15} />
+         
+         {/* Volumetric light ray effect simplified as additive plane/cone */}
+         <mesh position={[0, 2, 2.5]} rotation={[Math.PI / 2, 0, 0]}>
+           <coneGeometry args={[3, 6, 16]} />
+           <meshBasicMaterial color="#ffffff" transparent opacity={0.15} blending={2} depthWrite={false} side={2} />
+         </mesh>
       </group>
    );
 }
@@ -197,6 +216,47 @@ function EnemyWrapper({ engine, id }: { engine: GameEngine, id: string }) {
   );
 }
 
+function CampDetails() {
+  return (
+     <group>
+        {/* Central Map Table */}
+        <mesh position={[15, 0.4, 15]} castShadow receiveShadow>
+           <cylinderGeometry args={[2, 2, 0.8, 12]} />
+           <meshStandardMaterial color="#8b4513" />
+        </mesh>
+        <mesh position={[15, 0.81, 15]}>
+           <cylinderGeometry args={[1.9, 1.9, 0.05, 12]} />
+           <meshStandardMaterial color="#fef08a" />
+        </mesh>
+        
+        {/* Trader Stall 1 */}
+        <group position={[5, 0, 15]} rotation={[0, Math.PI/4, 0]}>
+           <mesh position={[0, 1, 0]} castShadow receiveShadow>
+             <boxGeometry args={[3, 2, 1.5]} />
+             <meshStandardMaterial color="#b45309" />
+           </mesh>
+           <mesh position={[0, 2.5, 0]} rotation={[-Math.PI/6, 0, 0]} castShadow>
+             <boxGeometry args={[3.2, 0.2, 2]} />
+             <meshStandardMaterial color="#ef4444" />
+           </mesh>
+        </group>
+
+        {/* Campfire */}
+        <group position={[25, 0, 25]}>
+           <mesh position={[0, 0.2, 0]}>
+             <cylinderGeometry args={[1, 1, 0.4, 8]} />
+             <meshStandardMaterial color="#333" />
+           </mesh>
+           <mesh position={[0, 0.6, 0]}>
+             <coneGeometry args={[0.5, 1, 4]} />
+             <meshStandardMaterial color="#f97316" transparent opacity={0.8} />
+           </mesh>
+           <pointLight position={[0, 1.5, 0]} color="#f97316" intensity={2} distance={10} />
+        </group>
+     </group>
+  );
+}
+
 export function GameScene({ engine, localId }: { engine: GameEngine, localId: string }) {
   const [playerIds, setPlayerIds] = useState<string[]>([]);
   const [enemyIds, setEnemyIds] = useState<string[]>([]);
@@ -241,8 +301,7 @@ export function GameScene({ engine, localId }: { engine: GameEngine, localId: st
         position={[-10, 20, 10]} 
         intensity={1.2} 
         castShadow 
-        shadow-mapSize-width={1024} 
-        shadow-mapSize-height={1024}
+        shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-20}
         shadow-camera-right={20}
         shadow-camera-top={20}
@@ -263,6 +322,8 @@ export function GameScene({ engine, localId }: { engine: GameEngine, localId: st
       {trees.map((t, i) => (
         <Tree key={i} position={[t.x, 0, t.z]} />
       ))}
+      
+      {engine.mapId === 'camp' && <CampDetails />}
       
       {doorIds.map(id => <ObjectiveDoor key={id} engine={engine} id={id} />)}
       {dropIds.map(id => <DropWrapper key={id} engine={engine} id={id} />)}
